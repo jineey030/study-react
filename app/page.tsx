@@ -11,6 +11,7 @@ import CounterDisplay from "@/components/practice/CounterDisplay"
 import ColorSelector from "@/components/practice/ColorSelector";
 import NumberSelector from "@/components/practice/NumberSelector"
 import Input from "@/components/practice/Input"
+import Login from "@/components/practice/Login"
 
 export default function Home() {
 
@@ -40,6 +41,9 @@ export default function Home() {
 
   // 입력값 보여주기
   const [txt, setTxt] = React.useState("");
+
+  // 로그인/로그아웃
+  const [isLoggedIn, setIsLoggedIn] = React.useState(false);
    
   return (
     
@@ -106,6 +110,21 @@ export default function Home() {
           <h1> 현재 입력값: {txt}</h1>
 
           <Input onInputText={setTxt}/>
+        </div>
+
+        {/* 조건부 렌더링 */}
+        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+          <h1>
+            로그인 상태: 
+          </h1>
+          {isLoggedIn && 
+            <p>로그인 <br/>
+            환영합니다, 철수님!</p>
+          }
+          
+          {!isLoggedIn && <p>로그아웃</p>}
+           
+          <Login isLoggedIn={isLoggedIn} onLogin={setIsLoggedIn}/>
         </div>
         
       </main>
