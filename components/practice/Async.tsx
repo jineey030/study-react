@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import PostItem from '@/components/practice/PostItem';
 
 interface Post {
     userId: number;
@@ -107,25 +108,17 @@ export default function ReqAPI() {
                 </button>
               </div>
             ) : (
+              // 상세 보기는 별도의 컴포넌트로 분리
               <ul>
                 {filteredPosts.slice(0, visibleCount).map((post) => (
-                  <li key={post.id} className="mb-4">
-                    <div
-                      className="font-semibold"
-                      onClick={() => handleDetail(post.id)}
-                    >
-                      {post.id}. {post.title}
-                    </div>
-                  </li>
+                  <PostItem
+                    key={post.id}
+                    post={post}
+                    onDetail={handleDetail}
+                  />
                 ))}
               </ul>
             )}
-
-          {!selectedPost && visibleCount < filteredPosts.length && (
-            <button onClick={handleLoadMore} className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition mt-4">
-              더보기 ({visibleCount}/{filteredPosts.length})
-            </button>
-          )}
         </div>
       )}
     </div>    
