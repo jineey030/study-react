@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface Todo {
   id: number;
@@ -36,6 +36,25 @@ export default function TodoList() {
     { id: 2, text: '운동하기', completed: false },
     { id: 3, text: '책 읽기', completed: false }
   ]);
+
+  useEffect(() => {
+    console.log("Todo 목록이 변경되었습니다." + "\n" + "현재 Todo 개수: " + todos.length);
+
+    if(todos.length === 0){
+        console.log("할 일이 없습니다☺️");
+    }
+  }, [todos]);
+
+  useEffect(() => {
+    const isFinished = 
+        todos.length > 0 &&
+        todos.every(todo => todo.completed);
+
+    if(isFinished){
+        console.log("🎉 모든 할 일을 완료하였습니다!");
+    }
+    
+  }, [todos]);
 
   const handleDelete = (id:number) => {
     setTodos(prevTodos => prevTodos.filter(todo => todo.id !== id));
