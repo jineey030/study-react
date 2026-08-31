@@ -13,6 +13,7 @@ import NumberSelector from "@/components/practice/NumberSelector"
 import Input from "@/components/practice/Input"
 import Login from "@/components/practice/Login"
 import TodoList from "@/components/practice/TodoList"
+import ReqAPI from "@/components/practice/ReqAPI"
 
 export default function Home() {
 
@@ -141,6 +142,12 @@ export default function Home() {
         <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
           <h2 className="text-lg font-semibold mb-4">📝 Todo List</h2>
           <TodoList />
+        </section>
+
+        {/* API 데이터 가져오기 */}
+        <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+          <h2 className="text-lg font-semibold mb-4">🌐 API 데이터 가져오기</h2>
+          <ReqAPI />
         </section>
 
       </main>
