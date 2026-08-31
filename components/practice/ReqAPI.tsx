@@ -11,20 +11,52 @@ interface Post {
 
 export default function ReqAPI() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [visibleCount, setVisibleCount] = useState(3);
 
-  useEffect(() => {
-    fetch('https://jsonplaceholder.typicode.com/posts')
-      .then(res => res.json())
+  // 다시시도 버튼을 누를 때 실행될 함수
+  const fetchPosts = () => {
+    setLoading(true);
+    setError(''); 
+
+    fetch('https://jsonplaceholder.typicode.com/posts') // 정상 주소
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('네트워크 응답이 정상적이지 않습니다.');
+        }
+        return res.json();
+      })
       .then(data => {
         setPosts(data);
         setLoading(false);
       })
       .catch(error => {
         console.error("에러 발생:", error);
+        setError("🚨 게시글을 불러오는데 실패했습니다.");
+        setLoading(false);
+      });
+  };
+
+  // 최초 진입 시에는 의도적으로 에러 주소를 호출하여 에러 화면 테스트
+  useEffect(() => {
+    setLoading(true);
+    
+    fetch('https://jsonplaceholder.typicode.com/posts-error-test') // 에러 유도 주소
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('초기 로드 에러');
+        }
+        return res.json();
+      })
+      .then(data => {
+        setPosts(data);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error("에러 발생:", error);
+        setError("🚨 게시글을 불러오는데 실패했습니다.");
         setLoading(false);
       });
   }, []);
@@ -34,7 +66,7 @@ export default function ReqAPI() {
   };
 
   const filteredPosts = posts.filter(post => {
-    return post.title.toLowerCase().includes(search.toLowerCase())
+    return post.title.toLowerCase().includes(search.toLowerCase());
   });
 
   return (
@@ -52,10 +84,19 @@ export default function ReqAPI() {
 
       {loading ? (
         <p> 로딩중 ...</p>
+      ) : error ? (
+        <div className="flex flex-col items-start gap-3">
+          <p>{error}</p>
+          <button
+            onClick={fetchPosts}
+            className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition"
+          >
+            다시시도
+          </button>
+        </div>
       ) : (
         <div>
           <ul>
-            {/* slice를 사용해 앞에서부터 visibleCount 개수만큼만 렌더링 */}
             {filteredPosts.slice(0, visibleCount).map((post) => (
               <li key={post.id} className="mb-4">
                 <div className="font-semibold">
@@ -68,11 +109,10 @@ export default function ReqAPI() {
             ))}
           </ul>
 
-          {/* 전체 개수보다 보여주고 있는 개수가 적을 때만 '더보기' 버튼 노출 */}
           {visibleCount < filteredPosts.length && (
             <button 
               onClick={handleLoadMore}
-              className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition"
+              className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition mt-4"
             >
               더보기 ({visibleCount}/{filteredPosts.length})
             </button>
