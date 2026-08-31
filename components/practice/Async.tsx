@@ -63,6 +63,10 @@ export default function ReqAPI() {
     setSelectedPost(null);
   }
 
+  const handleDelete = (id:number) => {
+    setPosts(prevPosts => prevPosts.filter(post => post.id !== id));
+  }
+
   return (
     <div>
       <div className="flex gap-2 mb-6">
@@ -108,13 +112,14 @@ export default function ReqAPI() {
                 </button>
               </div>
             ) : (
-              // 상세 보기는 별도의 컴포넌트로 분리
+              // 목록보기는 별도의 컴포넌트로 분리
               <ul>
                 {filteredPosts.slice(0, visibleCount).map((post) => (
                   <PostItem
                     key={post.id}
                     post={post}
                     onDetail={handleDetail}
+                    onDelete={handleDelete}
                   />
                 ))}
               </ul>
