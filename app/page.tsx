@@ -10,6 +10,7 @@ import Profile from "@/components/practice/Profile"
 import CounterDisplay from "@/components/practice/CounterDisplay"
 import ColorSelector from "@/components/practice/ColorSelector";
 import NumberSelector from "@/components/practice/NumberSelector"
+import Input from "@/components/practice/Input"
 
 export default function Home() {
 
@@ -36,6 +37,9 @@ export default function Home() {
   function handleSelectNumber(number:number){
     setNumber(number);
   }
+
+  // 입력값 보여주기
+  const [txt, setTxt] = React.useState("");
    
   return (
     
@@ -90,11 +94,20 @@ export default function Home() {
         </div>
 
         {/* callback */}
-        <h1>
-          현재 선택한 숫자: {number}
-        </h1>
+        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+          <h1>
+            현재 선택한 숫자: {number}
+          </h1>
+          <NumberSelector onSelectNumber={handleSelectNumber}/>
+        </div>
+        
+        {/* input 연습 */}
+        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+          <h1> 현재 입력값: {txt}</h1>
 
-        <NumberSelector onSelectNumber={handleSelectNumber}/>
+          <Input onInputText={setTxt}/>
+        </div>
+        
       </main>
     </div>
   );
