@@ -15,6 +15,7 @@ export default function ReqAPI() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [visibleCount, setVisibleCount] = useState(3);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
 
   const fetchPosts = async () => {
     try {
@@ -52,6 +53,15 @@ export default function ReqAPI() {
     return post.title.toLowerCase().includes(search.toLowerCase());
   });
 
+  const handleDetail = (id:number) => {
+    const selected = posts.find(post => post.id === id);
+    setSelectedPost(selected || null);
+  }
+
+  const handleList = () => {
+    setSelectedPost(null);
+  }
+
   return (
     <div>
       <div className="flex gap-2 mb-6">
@@ -79,18 +89,37 @@ export default function ReqAPI() {
         </div>
       ) : (
         <div>
-          <ul>
-            {filteredPosts.slice(0, visibleCount).map((post) => (
-              <li key={post.id} className="mb-4">
+            {selectedPost ? (
+              <div>
                 <div className="font-semibold">
-                  {post.id}. {post.title}
+                  {selectedPost.id}. {selectedPost.title}
                 </div>
+
                 <div className="text-zinc-500 pl-4">
-                  {post.body}
+                  {selectedPost.body}
                 </div>
-              </li>
-            ))}
-          </ul>
+
+                <button
+                  className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition mt-4"
+                  onClick={handleList}
+                >
+                  ⬅️ 목록으로 돌아가기
+                </button>
+              </div>
+            ) : (
+              <ul>
+                {filteredPosts.slice(0, visibleCount).map((post) => (
+                  <li key={post.id} className="mb-4">
+                    <div
+                      className="font-semibold"
+                      onClick={() => handleDetail(post.id)}
+                    >
+                      {post.id}. {post.title}
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
 
           {visibleCount < filteredPosts.length && (
             <button 
