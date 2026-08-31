@@ -151,9 +151,9 @@ export default function Home() {
           <ReqAPI />
         </section>
 
-        {/* (async) API 데이터 가져오기 */}
+        {/* 글 상세보기 */}
         <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
-          <h2 className="text-lg font-semibold mb-4">🌐 API 데이터 가져오기 (async)</h2>
+          <h2 className="text-lg font-semibold mb-4">👀 글 상세 보기</h2>
           <Async />
         </section>
       </main>
