@@ -8,8 +8,12 @@ interface Todo {
   completed: boolean;
 }
 
+type Filter = 'all' | 'active' | 'completed';
+
 export default function TodoList() {
   const [text, setText] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
+
 
   const handleSubmit = () => {
     if (text.trim() === '') {
@@ -68,12 +72,46 @@ export default function TodoList() {
     );
   };
 
+  const handleFilter = (status: Filter) => {
+    setFilter(status);
+  };
+
+  const filteredTodos = todos.filter(todo => {
+    if (filter === 'completed') return todo.completed; 
+    if (filter === 'active') return !todo.completed; 
+
+    return true;
+  });
+
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">할 일 목록</h2>
+        <div className="flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-zinc-600 dark:text-zinc-400">할 일 목록</h2>
+
+            <div className="flex bg-zinc-100 dark:bg-zinc-800 p-0.5 rounded-lg text-xs font-medium text-zinc-600 dark:text-zinc-400">
+                <button 
+                    className={`px-2.5 py-1 rounded-md transition ${filter === 'all' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'hover:text-zinc-800 dark:hover:text-zinc-200'}`} 
+                    onClick={() => handleFilter('all')}
+                >
+                    전체
+                </button>
+                <button 
+                    className={`px-2.5 py-1 rounded-md transition ${filter === 'active' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'hover:text-zinc-800 dark:hover:text-zinc-200'}`} 
+                    onClick={() => handleFilter('active')}
+                >
+                    진행중
+                </button>
+                <button 
+                    className={`px-2.5 py-1 rounded-md transition ${filter === 'completed' ? 'bg-white dark:bg-zinc-700 text-zinc-800 dark:text-zinc-100 shadow-sm' : 'hover:text-zinc-800 dark:hover:text-zinc-200'}`} 
+                    onClick={() => handleFilter('completed')}
+                >
+                    완료
+                </button>
+            </div>
+        </div>
 
       <ul className="flex flex-col gap-2">
-        {todos.map((todo) => (
+        {filteredTodos.map((todo) => (
           <li 
             key={todo.id}
             className="px-4 py-2.5 text-zinc-700 dark:text-zinc-200 bg-zinc-50 dark:bg-zinc-800/50 border border-zinc-200 dark:border-zinc-700 rounded-lg shadow-sm flex items-center justify-between gap-3"
