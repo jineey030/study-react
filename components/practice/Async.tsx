@@ -16,7 +16,7 @@ export default function ReqAPI() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [visibleCount, setVisibleCount] = useState(3);
-  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
   const fetchPosts = async () => {
     try {
@@ -46,34 +46,39 @@ export default function ReqAPI() {
     fetchPosts();
   }, []);
 
-  const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 3);
-  };
-
   const filteredPosts = posts.filter(post => {
     return post.title.toLowerCase().includes(search.toLowerCase());
   });
 
   const handleDetail = (id:number) => {
-    const selected = posts.find(post => post.id === id);
-    setSelectedPost(selected || null);
+    setSelectedId(id);
   }
 
   const handleList = () => {
-    setSelectedPost(null);
+    setSelectedId(null);
   }
 
-  const handleDelete = (id:number) => {
+  const handleLoadMore = () => {
+    setVisibleCount(prev => prev + 3);
+  };
+
+  const handleDelete = (id: number) => {
     setPosts(prevPosts => prevPosts.filter(post => post.id !== id));
-  }
+
+    if (selectedId === id) {
+      setSelectedId(null);
+    }
+  };
 
   const handleEdit = (id: number, title: string) => {
     setPosts(prevPosts =>
       prevPosts.map(post =>
-        post.id === id ? { ...post, title: title } : post
+        post.id === id ? { ...post, title } : post
       )
     );
   };
+
+  const selectedPost = posts.find(post => post.id === selectedId);
 
   return (
     <div>
@@ -132,6 +137,15 @@ export default function ReqAPI() {
                   />
                 ))}
               </ul>
+            )}
+
+            {visibleCount < filteredPosts.length && (
+              <button 
+                onClick={handleLoadMore}
+                className="px-4 py-2 bg-zinc-200 dark:bg-zinc-700 text-zinc-800 dark:text-zinc-200 rounded-lg font-medium hover:bg-zinc-300 dark:hover:bg-zinc-600 transition mt-4"
+              >
+                더보기 ({visibleCount}/{filteredPosts.length})
+              </button>
             )}
         </div>
       )}
