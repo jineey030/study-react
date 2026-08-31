@@ -67,6 +67,14 @@ export default function ReqAPI() {
     setPosts(prevPosts => prevPosts.filter(post => post.id !== id));
   }
 
+  const handleEdit = (id: number, title: string) => {
+    setPosts(prevPosts =>
+      prevPosts.map(post =>
+        post.id === id ? { ...post, title: title } : post
+      )
+    );
+  };
+
   return (
     <div>
       <div className="flex gap-2 mb-6">
@@ -120,6 +128,7 @@ export default function ReqAPI() {
                     post={post}
                     onDetail={handleDetail}
                     onDelete={handleDelete}
+                    onEdit={handleEdit}
                   />
                 ))}
               </ul>
