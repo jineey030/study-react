@@ -5,31 +5,36 @@ import { addDays } from "date-fns"
 import { type DateRange } from "react-day-picker"
 import { Calendar } from "@/components/ui/calendar"
 import { Card, CardContent } from "@/components/ui/card"
-import Image from "next/image";
 import Counter from "@/components/practice/Counter"
 import Profile from "@/components/practice/Profile"
 import CounterDisplay from "@/components/practice/CounterDisplay"
+import ColorSelector from "@/components/practice/ColorSelector";
+import NumberSelector from "@/components/practice/NumberSelector"
 
 export default function Home() {
 
-  const [date, setDate] = React.useState<Date | undefined>(new Date());
-
+  // 날짜
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
     from: new Date(new Date().getFullYear(), 0, 12),
     to: addDays(new Date(new Date().getFullYear(), 0, 12), 30),
   });
 
+  // 카운팅 수정
   const [count, setCount] = React.useState(0);
-
-  function CalendarRange() {
-    const [dateRange, setDateRange] = React.useState<DateRange | undefined>({
-      from: new Date(new Date().getFullYear(), 0, 12),
-      to: addDays(new Date(new Date().getFullYear(), 0, 12), 30),
-    });
-  }
-
   function upCnt(){
     setCount(prevCount => prevCount +1);
+  }
+
+  // 색깔 바꾸기
+  const [color, setColor] = React.useState("없음");
+  function changeColor(color:string){
+    setColor(color);
+  }
+
+  // 숫자 고르기
+  const [number, setNumber] = React.useState(0);
+  function handleSelectNumber(number:number){
+    setNumber(number);
   }
    
   return (
@@ -66,6 +71,7 @@ export default function Home() {
 
         <br/>
 
+        {/* 부모 -> 자식 useState 전달 */}
         <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
           <h1>현재 카운트: {count}</h1>
           <button onClick={upCnt} className="px-4 py-2 font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:scale-95 transition">
@@ -73,6 +79,22 @@ export default function Home() {
           </button>
           <CounterDisplay count ={count}/>
         </div>
+
+        {/* 함수 전달 */}
+        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
+           <h1>
+              현재 선택한 색상: {color}
+            </h1>
+
+            <ColorSelector changeColor={changeColor}/>
+        </div>
+
+        {/* callback */}
+        <h1>
+          현재 선택한 숫자: {number}
+        </h1>
+
+        <NumberSelector onSelectNumber={handleSelectNumber}/>
       </main>
     </div>
   );
