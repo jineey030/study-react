@@ -13,7 +13,9 @@ type Filter = 'all' | 'active' | 'completed';
 export default function TodoList() {
   const [text, setText] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
-
+  
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editText, setEditText] = useState('');
 
   const handleSubmit = () => {
     if (text.trim() === '') {
@@ -76,6 +78,23 @@ export default function TodoList() {
     setFilter(status);
   };
 
+  const handleEditStart = (todo: Todo) => {
+    setEditingId(todo.id);
+    setEditText(todo.text);
+  }
+
+  const handleEditSave = (id:number) => {
+    if (editText.trim() === '') return;
+
+    setTodos(prevTodos =>
+      prevTodos.map(todo =>
+        todo.id === id ? { ...todo, text: editText } : todo
+      )
+    );
+    setEditingId(null);
+    setEditText('');
+  }
+
   const filteredTodos = todos.filter(todo => {
     if (filter === 'completed') return todo.completed; 
     if (filter === 'active') return !todo.completed; 
@@ -123,18 +142,46 @@ export default function TodoList() {
                 className="w-4 h-4 text-blue-600 rounded border-zinc-300 focus:ring-blue-500 dark:border-zinc-600 dark:bg-zinc-700" 
                 onChange={() => handleToggle(todo.id)}
                 />
-                <span className={todo.completed ? "line-through text-zinc-400 dark:text-zinc-500" : ""}>
-                    {todo.text}
-                </span>
+                
+                {editingId === todo.id ? (
+                  <input 
+                    type="text"
+                    value={editText}
+                    onChange={(e) => setEditText(e.target.value)}
+                    className="flex-1 px-2 py-1 text-sm bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  />
+                ) : (
+                  <span className={todo.completed ? "line-through text-zinc-400 dark:text-zinc-500" : ""}>
+                      {todo.text}
+                  </span>
+                )}
             </div>
 
-            <button 
-                className="px-2 py-1 font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 active:scale-95 transition" 
+           <div className="flex items-center gap-2">
+                {editingId === todo.id ? (
+                <button 
+                    className="px-2.5 py-1 text-xs font-semibold text-white bg-green-500 rounded-lg hover:bg-green-600 active:scale-95 transition" 
+                    onClick={() => handleEditSave(todo.id)}
+                >
+                    저장
+                </button>
+                ) : (
+                <button 
+                    className="px-2.5 py-1 text-xs font-semibold text-white bg-blue-500 rounded-lg hover:bg-blue-600 active:scale-95 transition" 
+                    onClick={() => handleEditStart(todo)}
+                >
+                    수정
+                </button>
+                )}
+
+                <button 
+                className="px-2.5 py-1 text-xs font-semibold text-white bg-red-500 rounded-lg hover:bg-red-600 active:scale-95 transition" 
                 onClick={() => handleDelete(todo.id)}
-            >
+                >
                 삭제
-            </button>
-            </li>
+                </button>
+            </div>
+        </li>
         ))}
       </ul>
 
