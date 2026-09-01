@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 
 type CategoryType = 'food' | 'traffic' | 'shopping';
@@ -46,7 +46,19 @@ export default function ExpenseApp() {
     const [text, setText] = useState('');
     const [date, setDate] = useState(today);
 
-    const [list, setList] = useState<Expense[]>([]);
+    const [list, setList] = useState<Expense[]>(() => {
+        const savedList = localStorage.getItem('expenses');
+
+        if (!savedList) {
+            return [];
+        }
+
+        return JSON.parse(savedList);
+    });
+
+    useEffect(() => {
+        localStorage.setItem('expenses', JSON.stringify(list));
+    }, [list]);
 
     const [editId, setEditId] = useState<string | null>(null);
     const [editText, setEditText] = useState('');
