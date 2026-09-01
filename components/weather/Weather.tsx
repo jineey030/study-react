@@ -2,13 +2,152 @@
 
 import { useState } from 'react';
 
+type WeatherData = {
+    city: string;
+    temperature: number;
+    description: string;
+    humidity: number;
+    windSpeed: number;
+    weatherCode: number;
+};
+
+const cityMap: Record<string, string> = {
+    서울: 'Seoul',
+    부산: 'Busan',
+    인천: 'Incheon',
+    대구: 'Daegu',
+    대전: 'Daejeon',
+    광주: 'Gwangju',
+    울산: 'Ulsan',
+};
+
+const getWeatherInfo = (code: number) => {
+    if (code === 0) {
+        return {
+            description: '맑음',
+            icon: '☀️',
+        };
+    }
+
+    if (code === 1 || code === 2 || code === 3) {
+        return {
+            description: '구름 많음',
+            icon: '⛅',
+        };
+    }
+
+    if (code === 45 || code === 48) {
+        return {
+            description: '안개',
+            icon: '🌫️',
+        };
+    }
+
+    if (code >= 51 && code <= 57) {
+        return {
+            description: '이슬비',
+            icon: '🌦️',
+        };
+    }
+
+    if (code >= 61 && code <= 67) {
+        return {
+            description: '비',
+            icon: '🌧️',
+        };
+    }
+
+    if (code >= 71 && code <= 77) {
+        return {
+            description: '눈',
+            icon: '❄️',
+        };
+    }
+
+    if (code >= 80 && code <= 82) {
+        return {
+            description: '소나기',
+            icon: '🌦️',
+        };
+    }
+
+    if (code >= 95 && code <= 99) {
+        return {
+            description: '뇌우',
+            icon: '⛈️',
+        };
+    }
+
+    return {
+        description: '알 수 없음',
+        icon: '🌤️',
+    };
+};
+
 export default function Weather() {
     const [city, setCity] = useState('');
+    const [weather, setWeather] = useState<WeatherData | null>(null);
 
-    const handleSearch = (e: React.FormEvent) => {
+    const searchGeoAPI = async () => {
+        try {
+            const englishCity = cityMap[city] || city || 'Seoul';
+
+            const params = new URLSearchParams({
+                name: englishCity,
+                count: '1',
+                language: 'en',
+                format: 'json',
+            });
+            
+            const url = `https://geocoding-api.open-meteo.com/v1/search?${params}`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error('지역 검색에 실패했습니다.');
+            }
+
+            const data = await response.json();
+            const result = data.results[0];
+
+            return result;
+        } catch(error) {
+            console.error('지역 검색 에러:', error);
+        }
+    }
+
+    const handleSearch = async (e: React.FormEvent) => {
         e.preventDefault();
-        alert(`${city || '서울'} 날씨 검색을 수행합니다.`);
+
+        const result = await searchGeoAPI();
+
+        const weatherUrl =
+            `https://api.open-meteo.com/v1/forecast` +
+            `?latitude=${result.latitude}` +
+            `&longitude=${result.longitude}` +
+            `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code`;
+
+        const weatherResponse = await fetch(weatherUrl);
+
+        if (!weatherResponse.ok) {
+            throw new Error('날씨 정보를 가져오는데 실패했습니다.');
+        }
+
+        const weatherData = await weatherResponse.json();
+        const weatherInfo = getWeatherInfo(
+            weatherData.current.weather_code
+        );
+
+        setWeather({
+            city: result.name,
+            temperature: weatherData.current.temperature_2m,
+            description: weatherInfo.description,
+            humidity: weatherData.current.relative_humidity_2m,
+            windSpeed: weatherData.current.wind_speed_10m,
+            weatherCode: weatherData.current.weather_code
+        });
     };
+
 
     return (
         <div className="w-full max-w-4xl mx-auto flex flex-col gap-6">
@@ -45,25 +184,25 @@ export default function Weather() {
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                         <span className="text-5xl p-3 bg-white/10 dark:bg-zinc-800 rounded-2xl backdrop-blur-sm">
-                            ☀️
+                            {weather ? getWeatherInfo(weather.weatherCode).icon : '🌤️'}
                         </span>
                         <div>
-                            <h4 className="text-2xl font-bold tracking-tight">서울</h4>
-                            <p className="text-blue-100 dark:text-zinc-400 text-sm font-medium">맑음</p>
+                            <h4 className="text-2xl font-bold tracking-tight">{weather?.city}</h4>
+                            <p className="text-blue-100 dark:text-zinc-400 text-sm font-medium">{weather?.description}</p>
                         </div>
                     </div>
 
                     {/* 가운데/오른쪽: 기온 및 상세 정보 */}
                     <div className="flex flex-col sm:items-end w-full sm:w-auto border-t sm:border-t-0 pt-4 sm:pt-0 border-white/20 dark:border-zinc-700">
                         <div className="text-4xl font-extrabold tracking-tight mb-2">
-                            27°C
+                            {weather?.temperature}°C
                         </div>
                         <div className="flex items-center gap-4 text-xs sm:text-sm text-blue-100 dark:text-zinc-300 font-medium">
                             <span className="flex items-center gap-1 bg-white/10 dark:bg-zinc-800 px-3 py-1.5 rounded-lg">
-                                💧 습도 65%
+                                💧 습도 {weather?.humidity}%
                             </span>
                             <span className="flex items-center gap-1 bg-white/10 dark:bg-zinc-800 px-3 py-1.5 rounded-lg">
-                                💨 바람 2.4m/s
+                                💨 바람 {weather?.windSpeed}m/s
                             </span>
                         </div>
                     </div>
