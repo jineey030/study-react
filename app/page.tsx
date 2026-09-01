@@ -17,6 +17,7 @@ import ReqAPI from "@/components/practice/ReqAPI"
 import Async from "@/components/practice/Async"
 import Product, { products, type CartType } from "@/components/practice/Product"
 import Cart from "@/components/practice/Cart"
+import ExpenseApp from "@/components/budget-book/ExpenseApp"
 
 export default function Home() {
   // 화면 전환을 위한 상태 (기본값: 'home')
@@ -126,6 +127,12 @@ export default function Home() {
             className={`px-4 py-2 rounded-lg font-semibold transition ${currentView === "cart" ? "bg-blue-500 text-white" : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"}`}
           >
             장바구니
+          </button>
+          <button 
+            onClick={() => setCurrentView("budget")}
+            className={`px-4 py-2 rounded-lg font-semibold transition ${currentView === "budget" ? "bg-blue-500 text-white" : "bg-zinc-200 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"}`}
+          >
+            가계부
           </button>
         </div>
 
@@ -267,6 +274,14 @@ export default function Home() {
             <h2 className="text-lg font-semibold mb-4">🛒 장바구니</h2>
             <Product onAddCart={addToCart}/>
             <Cart qty={qty} onUpCart={upCart} onDownCart={downCart}/>
+          </section>
+        )}
+
+        {/* 가계부 */}
+        {(currentView === "home" || currentView === "budget") && (
+          <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+            <h2 className="text-lg font-semibold mb-4">🐖 가계부</h2>
+            <ExpenseApp />
           </section>
         )}
       </main>
