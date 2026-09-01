@@ -1,3 +1,5 @@
+'use client';
+
 import { useState, useEffect } from 'react';
 import { Plus } from 'lucide-react';
 
@@ -46,19 +48,24 @@ export default function ExpenseApp() {
     const [text, setText] = useState('');
     const [date, setDate] = useState(today);
 
-    const [list, setList] = useState<Expense[]>(() => {
-        const savedList = localStorage.getItem('expenses');
-
-        if (!savedList) {
-            return [];
-        }
-
-        return JSON.parse(savedList);
-    });
+    const [list, setList] = useState<Expense[]>([]);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
+        const savedList = localStorage.getItem('expenses');
+
+        if (savedList) {
+            setList(JSON.parse(savedList));
+        }
+
+        setIsLoaded(true);
+    }, []);
+
+    useEffect(() => {
+        if (!isLoaded) return;
+
         localStorage.setItem('expenses', JSON.stringify(list));
-    }, [list]);
+    }, [list, isLoaded]);
 
     const [editId, setEditId] = useState<string | null>(null);
     const [editText, setEditText] = useState('');
