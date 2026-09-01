@@ -15,6 +15,8 @@ import Login from "@/components/practice/Login"
 import TodoList from "@/components/practice/TodoList"
 import ReqAPI from "@/components/practice/ReqAPI"
 import Async from "@/components/practice/Async"
+import Product, { products, type CartType } from "@/components/practice/Product"
+import Cart from "@/components/practice/Cart"
 
 export default function Home() {
 
@@ -47,6 +49,44 @@ export default function Home() {
 
   // 로그인/로그아웃
   const [isLoggedIn, setIsLoggedIn] = React.useState(false);
+
+  // 상품 개수
+  const [qty, setQty] = React.useState<CartType[]>([]);
+
+  // 장바구니 상품 담기
+  function addToCart(id:string){
+    setQty(prevQty => {
+      const exists = prevQty.some(q => q.id === id);
+      
+      if (exists) {
+        return prevQty.map(q => q.id === id ? { ...q, qty: q.qty + 1 } : q);
+      } else {
+        return [...prevQty, { id, qty: 1 }];
+      }
+    });
+  }
+
+  // 장바구니 수량 추가
+  function upCart(id: string){
+    setQty(prevQty => 
+      prevQty.map(qty => 
+        qty.id === id ? { ...qty, qty: qty.qty + 1 } : qty
+      )
+    );
+  }
+
+  // 장바구니 수량 삭제
+  function downCart(id: string) {
+    setQty(prevQty =>
+      prevQty
+        .map(item =>
+          item.id === id
+            ? { ...item, qty: item.qty - 1 }
+            : item
+        )
+        .filter(item => item.qty > 0)
+    );
+  }
      
   return (
     <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black min-h-screen py-12">
@@ -155,6 +195,13 @@ export default function Home() {
         <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
           <h2 className="text-lg font-semibold mb-4">👀 글 상세 보기</h2>
           <Async />
+        </section>
+
+        {/* 장바구니 담기 */}
+        <section className="w-full p-6 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-zinc-200 dark:border-zinc-800">
+          <h2 className="text-lg font-semibold mb-4">🛒 장바구니</h2>
+            <Product onAddCart={addToCart}/>
+            <Cart qty={qty} onUpCart={upCart} onDownCart={downCart}/>
         </section>
       </main>
     </div>
